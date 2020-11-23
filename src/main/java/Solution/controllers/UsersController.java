@@ -1,7 +1,8 @@
 package Solution.controllers;
 
-import Solution.dao.UsersDao;
-import Solution.models.User;
+import Solution.model.User;
+import Solution.service.UsersServiceImpl;
+import Solution.service.UsersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,24 +12,30 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/users")
 public class UsersController {
 
-    private final UsersDao usersDao;
+//    private final UserServiceImpl userServiceImpl;
+    private UsersService usersService;
 
     @Autowired
-    public UsersController(UsersDao usersDao) {
-        this.usersDao = usersDao;
+    public UsersController(UsersService usersService) {
+        this.usersService = usersService;
     }
+
+    //    public UsersController(UsersDaoImpl usersDaoImpl) {
+//        this.usersDaoImpl = usersDaoImpl;
+//    }
+
 
     @GetMapping()
     public String index(Model model) {
 //        получим всех юзеров из DAO и передадим на представление
-        model.addAttribute("users", usersDao.index());
+        model.addAttribute("users", usersService.index());
         return "users/index";
     }
 
     @GetMapping("/{id}")
     public String show(@PathVariable("id") int id, Model model) {
 //      получим юзера по id из DAO и передадим на представление
-        model.addAttribute("user", usersDao.show(id));
+        model.addAttribute("user", usersService.show(id));
         return "users/show";
     }
 
@@ -48,25 +55,25 @@ public class UsersController {
     @PostMapping()
     public String create(@ModelAttribute ("user") User user) {
 //    принимать на вход post запрос, создавать нового юзера, и добавлять в БД
-       usersDao.save(user);
+        usersService.save(user);
        return "redirect:/users";
     }
 
     @GetMapping("/{id}/edit")
     public String edit(Model model, @PathVariable("id") int id) {
-        model.addAttribute("user",usersDao.show(id));
+        model.addAttribute("user",usersService.show(id));
         return "users/edit";
     }
 
     @PatchMapping("/{id}")
     public String update(@ModelAttribute("user") User user, @PathVariable("id") int id) {
-        usersDao.update(id, user);
+        usersService.update(id, user);
         return "redirect:/users";
     }
 
     @DeleteMapping("/{id}")
     public String delete(@PathVariable("id") int id) {
-        usersDao.delete(id);
+        usersService.delete(id);
         return "redirect:/users";
     }
 }
